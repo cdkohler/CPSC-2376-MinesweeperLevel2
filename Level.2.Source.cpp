@@ -1,7 +1,7 @@
-\#include <iostream>
+#include <iostream>
 #include <random>
 #include <vector>
-
+#include <algorithm>
 /*Game Constants*/
 const int gameBoardSize{ 10 };
 enum class gamePieces { hiddenEmpty, revealedEmpty, hiddenMine, revealedMine };
@@ -19,7 +19,7 @@ void displayGameDone(const std::vector<gameSlot>& gameBoard);
 
 /* Engine Functions*/
 
-std::vector<gamePieces> boardSetup();
+std::vector<gameSlot> boardSetup();
 void changeGameState(std::vector<gameSlot>& gameBoard);
 bool isGameDone(const std::vector<gameSlot>& gameBoard);
 
@@ -33,7 +33,7 @@ int main()
 	char playAgain{ 'y' };
 	while (playAgain == 'y' || playAgain == 'Y')
 	{
-		std::vector<gamePieces>& gameBoard{ boardSetup() };
+		std::vector<gameSlot> gameBoard{ boardSetup() };
 		while (!isGameDone(gameBoard))
 		{
 			displayGameState(gameBoard);
@@ -59,7 +59,7 @@ void splashScreen()
 	system("PAUSE");
 }
 
-void displayGameState(const std::vector<gamePieces>& gameBoard, bool revealMines)
+void displayGameState(const std::vector<gameSlot>& gameBoard, bool revealMines)
 {
 	char rowName{ 'A' };
 	int colName{ 1 };
@@ -79,7 +79,7 @@ void displayGameState(const std::vector<gamePieces>& gameBoard, bool revealMines
 		rowName++;
 		for (int column{ 0 }; column < gameBoardSize; column++)
 		{
-			switch (gameBoard[boardIndex(row, column)])
+			switch (gameBoard[boardIndex(row, column)].piece)
 			{
 			case gamePieces::hiddenEmpty:
 				std::cout << "- ";
@@ -113,7 +113,7 @@ void displayGameDone(const std::vector<gameSlot>& gameBoard)
 	displayGameState(gameBoard, true);
 	for (auto slot : gameBoard)
 	{
-		if (slot == gamePieces::revealedMine)
+		if (slot.piece == gamePieces::revealedMine)
 		{
 			std::cout << "The mine exploded.... You are dead!!!!\n";
 			std::cout << "Better luck next time!";
@@ -136,11 +136,11 @@ std::vector<gameSlot> boardSetup()
 	{
 		if (mined(e))
 		{
-			slot = gamePieces::hiddenMine;
+			slot.piece = gamePieces::hiddenMine;
 		}
 		else
 		{
-			slot = gamePieces::hiddenEmpty;
+			slot.piece = gamePieces::hiddenEmpty;
 		}
 	}
 	return gameBoard;
@@ -171,15 +171,15 @@ void changeGameState(std::vector<gameSlot>& gameBoard)
 			std::cin >> column;
 			column--;
 		}
-	} while (gameBoard[boardIndex(numRow, column)] == gamePieces::revealedEmpty);
+	} while (gameBoard[boardIndex(numRow, column)].piece== gamePieces::revealedEmpty);
 
-	switch (gameBoard[boardIndex(numRow, column)])
+	switch (gameBoard[boardIndex(numRow, column)].piece)
 	{
 	case gamePieces::hiddenEmpty:
-		gameBoard[boardIndex(numRow, column)] = gamePieces::revealedEmpty;
+		gameBoard[boardIndex(numRow, column)].piece = gamePieces::revealedEmpty;
 		break;
 	case gamePieces::hiddenMine:
-		gameBoard[boardIndex(numRow, column)] = gamePieces::revealedMine;
+		gameBoard[boardIndex(numRow, column)].piece = gamePieces::revealedMine;
 		break;
 	}
 }
@@ -189,7 +189,7 @@ bool isGameDone(const std::vector<gameSlot>& gameBoard)
 	bool stillEmpty{ true };
 	for (auto slot : gameBoard)
 	{
-		switch (slot)
+		switch (slot.piece)
 		{
 		case gamePieces::hiddenEmpty:
 			stillEmpty = false;
@@ -212,8 +212,8 @@ int countMines(int row, int column, const std::vector<gameSlot>& gameBoard)
 			if ((neighborColumn != 0 || neighborRow != 0)
 				&& row + neighborRow >= 0 && row + neighborRow < gameBoardSize
 				&& column + neighborColumn >= 0 && column + neighborColumn < gameBoardSize
-				&& (gameBoard[boardIndex(row + neighborRow, column + neighborColumn)] == gamePieces::hiddenMine
-					|| gameBoard[boardIndex(row + neighborRow, column + neighborColumn)] == gamePieces::revealedMine))
+				&& (gameBoard[boardIndex(row + neighborRow, column + neighborColumn)].piece == gamePieces::hiddenMine
+					|| gameBoard[boardIndex(row + neighborRow, column + neighborColumn)].piece == gamePieces::revealedMine))
 			{
 				mineCount++;
 			}
