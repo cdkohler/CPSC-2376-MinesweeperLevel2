@@ -118,15 +118,20 @@ void displayGameState(const std::vector<gameSlot>& gameBoard, bool revealMines)
 void displayGameDone(const std::vector<gameSlot>& gameBoard)
 {
 	displayGameState(gameBoard, true);
-	for (auto slot : gameBoard)
-	{
-		if (slot.piece == gamePieces::revealedMine)
+	//for (auto slot : gameBoard)
+	//{
+		if (auto slot{std::find_if(gameBoard.begin(), gameBoard.end(), [&](gameSlot slot)
+	    	{
+		     return slot.piece == gamePieces::revealedMine;
+	    	}
+		)};
+		slot !=gameBoard.end())
 		{
 			std::cout << "The mine exploded.... You are dead!!!!\n";
 			std::cout << "Better luck next time!";
 			return;
 		}
-	}
+//	}
 	std::cout << "You have cleared the mine field!\n";
 	std::cout << "You are loved by all! Use your power for good!";
 }
