@@ -79,30 +79,37 @@ void displayGameState(const std::vector<gameSlot>& gameBoard, bool revealMines)
 		rowName++;
 		for (int column{ 0 }; column < gameBoardSize; column++)
 		{
-			switch (gameBoard[boardIndex(row, column)].piece)
-			{
-			case gamePieces::hiddenEmpty:
-				std::cout << "- ";
-				break;
-			case gamePieces::hiddenMine:
-				if (revealMines) std::cout << "* ";
-				else std::cout << "- ";
-				break;
-			case gamePieces::revealedMine:
-				std::cout << "* ";
-				break;
-			case gamePieces::revealedEmpty:
-			{
-				int numNeighbors{ countMines(row, column, gameBoard) };
+		    if (gameBoard[boardIndex(row, column)].flagged)
+		    {
+		        std::cout << "f ";
+		    }
+		    else
+		    {
+		    	switch (gameBoard[boardIndex(row, column)].piece)
+		    	{
+		    	case gamePieces::hiddenEmpty:
+			    	std::cout << "- ";
+			    	break;
+			    case gamePieces::hiddenMine:
+			    	if (revealMines) std::cout << "* ";
+			       	else std::cout << "- ";
+			    	break;
+		    	case gamePieces::revealedMine:
+			    	std::cout << "* ";
+			    	break;
+		    	case gamePieces::revealedEmpty:
+		    	{
+			    	int numNeighbors{ countMines(row, column, gameBoard) };
 
-				if (numNeighbors == 0)
-					std::cout << "  ";
-				else
-					std::cout << numNeighbors << " ";
-				break;
-			}
+			    	if (numNeighbors == 0)
+			    		std::cout << "  ";
+			    	else
+			    		std::cout << numNeighbors << " ";
+			    	break;
+			    }
 
-			}
+			    }
+		    }
 		}
 		std::cout << "\n";
 	}
@@ -171,17 +178,32 @@ void changeGameState(std::vector<gameSlot>& gameBoard)
 			std::cin >> column;
 			column--;
 		}
-	} while (gameBoard[boardIndex(numRow, column)].piece== gamePieces::revealedEmpty);
-
-	switch (gameBoard[boardIndex(numRow, column)].piece)
-	{
-	case gamePieces::hiddenEmpty:
-		gameBoard[boardIndex(numRow, column)].piece = gamePieces::revealedEmpty;
-		break;
-	case gamePieces::hiddenMine:
-		gameBoard[boardIndex(numRow, column)].piece = gamePieces::revealedMine;
-		break;
-	}
+	} while (gameBoard[boardIndex(numRow, column)].piece == gamePieces::revealedEmpty);
+	
+    char flag{' '};
+    while (flag !='y' && flag !='n')
+    {
+        std::cout << "Do you want to flag this spot?\n";
+        std::cout << " 'y' for yes and 'n' for no.";
+        std::cin >> flag;
+    }
+    if (flag == 'y')
+    {
+        //std::cout << "f ";
+        gameBoard[boardIndex(numRow, column)].flagged = !gameBoard[boardIndex(numRow, column)].flagged;
+    }
+    else
+    {
+    	switch (gameBoard[boardIndex(numRow, column)].piece)
+	    {
+	    case gamePieces::hiddenEmpty:
+	    	gameBoard[boardIndex(numRow, column)].piece = gamePieces::revealedEmpty;
+	    	break;
+    	case gamePieces::hiddenMine:
+	    	gameBoard[boardIndex(numRow, column)].piece = gamePieces::revealedMine;
+	    	break;
+    	}
+    }
 }
 
 bool isGameDone(const std::vector<gameSlot>& gameBoard)
@@ -219,6 +241,5 @@ int countMines(int row, int column, const std::vector<gameSlot>& gameBoard)
 			}
 		}
 	}
-	return 0;
 	return mineCount;
 }
