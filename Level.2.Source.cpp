@@ -143,18 +143,18 @@ std::vector<gameSlot> boardSetup()
 	static std::random_device seed;
 	static std::default_random_engine e(seed());
 	static std::bernoulli_distribution mined(.25);
-	
-	for (auto& slot : gameBoard)
+	std::generate(gameBoard.begin(), gameBoard.end(), [&](gameSlot Slot)
+//	for (auto& slot : gameBoard)
 	{
 		if (mined(e))
 		{
-			slot.piece = gamePieces::hiddenMine;
+			return = gamePieces::hiddenMine;
 		}
 		else
 		{
-			slot.piece = gamePieces::hiddenEmpty;
+			return = gamePieces::hiddenEmpty;
 		}
-	}
+	});
 	return gameBoard;
 }
 
